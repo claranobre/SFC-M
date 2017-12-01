@@ -33,7 +33,9 @@ bool input_init; //whether input[] has only valid values
 //      https://github.com/WorldFamousElectronics/PulseSensor_Amped_Processing_Visualizer
 // SERIAL_PLOTTER outputs sensor data for viewing with the Arduino Serial Plotter
 //      run the Serial Plotter at 115200 baud: Tools/Serial Plotter or Command+L
-static int outputType = SERIAL_PLOTTER;
+//static int outputType = SERIAL_PLOTTER;
+
+static int OUTPUT_TYPE = PROCESSING_VISUALIZER;
 
 void setup()
 {
