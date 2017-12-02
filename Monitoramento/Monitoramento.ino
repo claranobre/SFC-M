@@ -37,15 +37,15 @@ int fadeRate[numPulseSensors];                 // used to fade LED on with PWM o
 
 // LED's
 // red = blinkPin
-int yellow = 12;
-int green = 11;
+int yellow[numPulseSensors];
+int green[numPulseSensors];
 int led_on;
 
 // Volatile Variables, used in the interrupt service routine!
 volatile int BPM[numPulseSensors];                   // int that holds raw Analog in 0. updated every 2mS
 volatile int Signal[numPulseSensors];                // holds the incoming raw data
 volatile int IBI[numPulseSensors];             // int that holds the time interval between beats! Must be seeded!
-volatile boolean Pulse[numPulseSensors];     // "True" when User's live heartbeat is detected. "False" when not a "live beat".
+volatile boolean Pulse[numPulseSensors];     // "True" when User's live heartbeat is detected. "False" [numPulseSensors]when not a "live beat".
 volatile boolean QS[numPulseSensors];        // becomes true when Arduoino finds a beat.
 
 // Regards Serial OutPut  -- Set This Up to your needs
@@ -78,19 +78,22 @@ bool input_init; //whether input[] has only valid values
 //      https://github.com/WorldFamousElectronics/PulseSensor_Amped_Processing_Visualizer
 // SERIAL_PLOTTER outputs sensor data for viewing with the Arduino Serial Plotter
 //      run the Arduino Serial Plotter at 115200 baud: Tools/Serial Plotter or Command+L
+
 static int outputType = SERIAL_PLOTTER;
 
 void setup() {
 
   setStuph();                       // initialize variables and pins
 
-  Serial.begin(250000);             // we agree to talk fast!
-
+  //Serial.begin(250000);          // we agree to talk fast!
+  Serial.begin(115200);           // we agree to talk fast!
+   
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS
 }
 
 //  Where the Magic Happens
 void loop(){
+  
     /* Systolic range: [90, 250]
      Diastolic range: [60, 140]
     */
@@ -98,27 +101,27 @@ void loop(){
   int val = analogRead(A0);
   int val2 = analogRead(A1);
   
-    serialOutput() ;
+  serialOutput() ;
 
   for (int i = 0; i < numPulseSensors; i++) {
     if (QS[i] == true) {
       fadeRate[i] = 0;         // Makes the LED Fade Effect Happen
       // Set 'fadeRate' Variable to 255 to fade LED with pulse
       serialOutputWhenBeatHappens(i);   // A Beat Happened, Output that to serial.
+      
+      if (val >= diastolic_limits[0] && val2 >= diastolic_limits[0]) {
+        //receiving signal. Activate Analyzer
+        analyseData(val,val2);
+      }
+      else {
+        reset();
+      }
       QS[i] = false;
     }
   }
 
   ledFadeToBeat();                      // Makes the LED Fade Effect Happen
-  delay(20);                             //  take a break
-  
-  if (val >= diastolic_limits[0] && val2 >= diastolic_limits[0]) {
-    //receiving signal. Activate Analyzer
-    analyseData(val,val2);
-  }
-  else {
-    reset();
-  }
+  delay(10);                             //  take a break
 }
 
 // FADE BOTH LEDS
@@ -135,8 +138,9 @@ void setStuph() {
 
   //pinMode(blinkPin,OUTPUT);         // pin that will blink to your heartbeat!
   //pinMode(fadePin,OUTPUT);          // pin that will fade to your heartbeat!
-  pinMode(yellow, OUTPUT);
-  pinMode(green, OUTPUT);
+  
+  pinMode(12, OUTPUT);
+  pinMode(11, OUTPUT);
   
   /* use power from Arduino pins to power PulseSensors with +5V Power!
   pinMode(8, OUTPUT);
@@ -168,21 +172,46 @@ void setStuph() {
       case  0:
         pulsePin[i] = 0;    // pulse pin Analog 0
         blinkPin[i] = 13;   // blink output for pulse 0
-        fadePin[i] = 5;     // fade output for pulse 0
+        //fadePin[i] = 5;     // fade output for pulse 0
         break;
       case  1:
         pulsePin[i] = 1;    // pulse pin Analog 1
         blinkPin[i] = 12;   // blink output for pulse 1
-        fadePin[i] = 9;     // fade output for pulse 1
+        //fadePin[i] = 9;     // fade output for pulse 1
         break;
       // add more if you need to here
       default:
+        monitorar();
         break;
     }
+    
     pinMode(blinkPin[i], OUTPUT);        // pin that will blink to your heartbeat!
     digitalWrite(blinkPin[i], LOW);
     pinMode(fadePin[i], OUTPUT);         // pin that will fade to your heartbeat!
     analogWrite(fadePin[i], 255);
+  }
+}
+
+void monitorar() {
+  for (int i = 0; i < numPulseSensors; i++) {
+    if (isPressureLow()) {
+      turnLedOn(blinkPin[i]);
+    }
+    else if (isPressureNormal()) {
+      turnLedOn(green[i]);
+    }
+    else if (isPressureVeryHigh()) {
+      turnLedOn(blinkPin[i]);
+    }
+    else {
+    //pressure is high
+      turnLedOn(yellow[i]);
+    }
+
+  Serial.print(systolic[10]);
+  Serial.print(" / ");
+  Serial.println(diastolic[10]);
+  
   }
 }
 
@@ -205,14 +234,13 @@ void reset() {
   input_init = false;
   
   led_on = 0;
-  digitalWrite(blinkPin, LOW);
   //digitalWrite(yellow, LOW);
   //digitalWrite(green, LOW);
 }
 
-void analyseData(int BPM0, int BPM1) {
-  float mean = BPM0 / 2.0;
-  //mean += BPM1 / 2.0;
+void analyseData(int val, int val2) {
+  float mean = val / 2.0;
+  //mean += val2 / 2.0;
   
   input[input_index] = mean;
   input_index = (input_index + 1) % 3;
@@ -232,7 +260,7 @@ void analyseData(int BPM0, int BPM1) {
   
   //Serial.println(mean);
   if (dstlc_init && systlc_init) {
-    monitorar();
+    //monitorar();
   }
 }
 
@@ -256,16 +284,16 @@ bool isLocalMin() {
           input[candidate] <= input[(candidate + 1) % 3]);
 }
 
-void addToSystolic(float BPM) {
+void addToSystolic(float val) {
   if (systlc_init) {
     //detects if local maxima represents beat
-    if (isSystolic(BPM)) {
-      updateSystolic(BPM);
+    if (isSystolic(val)) {
+      updateSystolic(val);
       updateStdDev();
     }
   }
   else {
-    updateSystolic(BPM);
+    updateSystolic(val);
     if (systlc_index == 0) { //array filled with valid values
       systlc_init = true;
       updateStdDev();
@@ -273,33 +301,33 @@ void addToSystolic(float BPM) {
   }
 }
 
-bool isSystolic(float BPM) {
+bool isSystolic(float val) {
   //detects if local maxima represents beat
-  return BPM > diastolic[10] + std_dev;
+  return val > diastolic[10] + std_dev;
 }
 
-void updateSystolic(float BPM) {
+void updateSystolic(float val) {
   //computes mean
   systolic[10] -= systolic[systlc_index] / 10;
-  systolic[10] += BPM / 10;
+  systolic[10] += val / 10;
 
   //adds to list
-  systolic[systlc_index] = BPM;
+  systolic[systlc_index] = val;
 
   //updates index
   systlc_index = (systlc_index + 1) % 10;
 }
 
-void addToDiastolic(float BPM) {
+void addToDiastolic(float val) {
   if (dstlc_init) {
     //detects if local minima represents beat
-    if (isDiastolic(BPM)) {
-      updateDiastolic(BPM);
+    if (isDiastolic(val)) {
+      updateDiastolic(val);
       updateStdDev();
     }
   }
   else {
-    updateDiastolic(BPM);
+    updateDiastolic(val);
     if (dstlc_index == 0) { //array filled with valid values
       dstlc_init = true;
       updateStdDev();
@@ -307,18 +335,18 @@ void addToDiastolic(float BPM) {
   }
 }
 
-bool isDiastolic(float BPM) {
+bool isDiastolic(float val) {
   //detects if local minima represents beat
-  return BPM < systolic[10] - std_dev;
+  return val < systolic[10] - std_dev;
 }
 
-void updateDiastolic(float BPM) {
+void updateDiastolic(float val) {
     //computes mean
     diastolic[10] -= diastolic[dstlc_index] / 10;
-    diastolic[10] += BPM / 10;
+    diastolic[10] += val / 10;
     
     //adds to list
-    diastolic[dstlc_index] = BPM;
+    diastolic[dstlc_index] = val;
     
     //updates index
     dstlc_index = (dstlc_index + 1) % 10;
@@ -329,25 +357,6 @@ void updateStdDev() {
     std_dev = systolic[10] - diastolic[10];
     std_dev /= 1.4142; // approx. sqrt(2)
   }
-}
-
-void monitorar() {
-  if (isPressureLow()) {
-    turnLedOn(blinkPin);
-  }
-  else if (isPressureNormal()) {
-    turnLedOn(green);
-  }
-  else if (isPressureVeryHigh()) {
-    turnLedOn(blinkPin);
-  }
-  else {
-    //pressure is high
-    turnLedOn(yellow);
-  }
-  Serial.print(systolic[10]);
-  Serial.print(" / ");
-  Serial.println(diastolic[10]);
 }
 
 bool isPressureLow() {
@@ -368,11 +377,11 @@ bool isPressureVeryHigh() {
 }
 
 void turnLedOn(int new_led) {
-  if (led_on != new_led) {
-    if (led_on != 0) {
-      digitalWrite(led_on, LOW);
+    if (led_on != new_led) {
+      if (led_on != 0) {
+        digitalWrite(led_on, LOW);
+      }
+      led_on = new_led;
+      digitalWrite(led_on, HIGH);
     }
-    led_on = new_led;
-    digitalWrite(led_on, HIGH);
-  }
 }
