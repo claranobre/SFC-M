@@ -1,3 +1,6 @@
+
+
+ 
 void interruptSetup(){     
   // Initializes Timer2 to throw an interrupt every 2mS.
   TCCR2A = 0x02;     // DISABLE PWM ON DIGITAL PINS 3 AND 11, AND GO INTO CTC MODE
@@ -97,3 +100,8 @@ ISR(TIMER2_COMPA_vect){                           // triggered when Timer2 count
   }
   sei();                                   // enable interrupts when youre done!
 }// end isr
+
+
+
+
+
