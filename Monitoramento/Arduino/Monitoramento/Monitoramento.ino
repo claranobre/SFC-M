@@ -91,15 +91,15 @@ bool input_init; //whether input[] has only valid values
 // SERIAL_PLOTTER outputs sensor data for viewing with the Arduino Serial Plotter
 //      run the Arduino Serial Plotter at 115200 baud: Tools/Serial Plotter or Command+L
 
-static int outputType = SERIAL_PLOTTER;
-//static int outputType = PROCESSING_VISUALIZER;
+//static int outputType = SERIAL_PLOTTER;
+static int outputType = PROCESSING_VISUALIZER;
 
 void setup() {
 
   setStuph();                       // initialize variables and pins
 
-  //Serial.begin(250000);          // we agree to talk fast!
-  Serial.begin(115200);           // we agree to talk fast!
+  Serial.begin(250000);          // we agree to talk fast!
+  //Serial.begin(115200);           // we agree to talk fast!
    
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS
 }

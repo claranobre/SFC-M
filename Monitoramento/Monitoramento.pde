@@ -270,7 +270,7 @@ void resetDataTraces(){
 
 void printDataToScreen(){ // PRINT THE DATA AND VARIABLE VALUES
     fill(eggshell);                                       // get ready to print text
-    text("Pulse Sensor Amped 2 Sensor Visualizer", 245, 30);     // tell them what you are
+    text("Sensor de Monitoramento Cardíaco", 245, 30);     // tell them what you are
     for (int i=0; i<numSensors; i++) {
       text("Sensor # " + (i+1), 800, BPMWindowY[i] + 220);
       text(BPM[i] + " BPM", 800, BPMWindowY[i] +185);// 215          // print the Beats Per Minute

@@ -9,8 +9,8 @@ void setup()
   // is Serial.list()[0].
   // On Windows machines, this generally opens COM1.
   // Open whatever port is the one you're using.
-  printArray(Serial.list());
-  String portName = Serial.list()[4]; //change the 0 to a 1 or 2 etc. to match your port
+  String portName = Serial.list()[1]; //change the 0 to a 1 or 2 etc. to match your port
+  printArray(Serial.list()); 
   myPort = new Serial(this, portName, 115200);
 }
 
