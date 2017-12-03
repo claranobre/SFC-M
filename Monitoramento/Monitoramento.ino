@@ -1,16 +1,26 @@
 /*  Project Base:
- *   Pulse Sensor Amped 1.5    by Joel Murphy and Yury Gitman   http://www.pulsesensor.com
+    *  Pulse Sensor Multi Sensor
 
-----------------------  Notes ----------------------  ----------------------
-This code:
-1) Blinks an LED to User's Live Heartbeat   PIN 13
-2) Fades an LED to User's Live HeartBeat    PIN 5
-3) Determines BPM
-4) Prints All of the Above to Serial
+     by
+     Joel Murphy and Yury Gitman   http://www.pulsesensor.com *   Updated Winter 2017
 
-Read Me:
-https://github.com/WorldFamousElectronics/PulseSensor_Amped_Arduino/blob/master/README.md
- ----------------------       ----------------------  ----------------------
+     World Famous Electronics llc.  Public Domain. 2017
+
+
+  ----------------------  Notes ----------------------  ----------------------
+  This code:
+  1) Blinks an LED to two user's Live Heartbeat   PIN 13 and PIN 12
+  2) Fades an LED to two user's Live HeartBeat    PIN 5 and PIN 9
+  3) Determines BPMs for both users
+  4) Prints All of the Above to Arduino Serial Plotter or our Processing Visualizer
+
+  Plug the Pulse Sensor RED wires into UNO pins 7 and 8 for 5V power! 
+  Plug the Pulse Sensor BLACK wires into the GND pins
+  Plug the Pulse Sensor PURPLE wires into Analog 0 and Analog 1 pins
+
+  Read Me:
+  https://github.com/WorldFamousElectronics/PulseSensor_Amped_Arduino/blob/master/README.md
+  ----------------------       ----------------------  ----------------------
 */
 
 /*
@@ -79,14 +89,15 @@ bool input_init; //whether input[] has only valid values
 // SERIAL_PLOTTER outputs sensor data for viewing with the Arduino Serial Plotter
 //      run the Arduino Serial Plotter at 115200 baud: Tools/Serial Plotter or Command+L
 
-static int outputType = SERIAL_PLOTTER;
+//static int outputType = SERIAL_PLOTTER;
+static int outputType = PROCESSING_VISUALIZER;
 
 void setup() {
 
   setStuph();                       // initialize variables and pins
 
-  //Serial.begin(250000);          // we agree to talk fast!
-  Serial.begin(115200);           // we agree to talk fast!
+  Serial.begin(250000);          // we agree to talk fast!
+  //Serial.begin(115200);           // we agree to talk fast!
    
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS
 }
