@@ -79,6 +79,8 @@ float diastolic[11], systolic[11], std_dev;
 int dstlc_index, systlc_index;
 bool dstlc_init, systlc_init;
 
+float valsFromSensors[numPulseSensors];
+
 float input[3]; ////last 3 readings from sensors
 int input_index;
 bool input_init; //whether input[] has only valid values
@@ -109,8 +111,9 @@ void loop(){
      Diastolic range: [60, 140]
     */
       
-  int val = analogRead(A0);
-  int val2 = analogRead(A1);
+  valsFromSensors[0] = analogRead(A0);
+  valsFromSensors[1] = analogRead(A1);
+  bool doAnalysis = true;
   
   serialOutput() ;
 
@@ -120,15 +123,18 @@ void loop(){
       // Set 'fadeRate' Variable to 255 to fade LED with pulse
       serialOutputWhenBeatHappens(i);   // A Beat Happened, Output that to serial.
       
-      if (val >= diastolic_limits[0] && val2 >= diastolic_limits[0]) {
-        //receiving signal. Activate Analyzer
-        analyseData(val,val2);
-      }
-      else {
-        reset();
-      }
       QS[i] = false;
     }
+    if (doAnalysis && valsFromSensors[i] < diastolic_limits[0]) {
+      doAnalysis = false;
+    }
+  }
+
+  if (doAnalysis) {
+    analyseData();
+  }
+  else {
+    reset();
   }
 
   ledFadeToBeat();                      // Makes the LED Fade Effect Happen
@@ -191,8 +197,8 @@ void setStuph() {
         //fadePin[i] = 9;     // fade output for pulse 1
         break;
       // add more if you need to here
-      default:
-        monitorar();
+      default: //this is never called
+        //monitorar();
         break;
     }
     
@@ -220,7 +226,7 @@ void monitorar() {
     }
 
   Serial.print(systolic[10]);
-  Serial.print(" / ");
+  Serial.print(",");
   Serial.println(diastolic[10]);
   
   }
@@ -249,9 +255,11 @@ void reset() {
   //digitalWrite(green, LOW);
 }
 
-void analyseData(int val, int val2) {
-  float mean = val / 2.0;
-  //mean += val2 / 2.0;
+void analyseData() {
+  float mean = 0.0;
+  for (int i = 0; i < numPulseSensors; i++) {
+    mean += valsFromSensors[i];
+  }
   
   input[input_index] = mean;
   input_index = (input_index + 1) % 3;
@@ -271,7 +279,7 @@ void analyseData(int val, int val2) {
   
   //Serial.println(mean);
   if (dstlc_init && systlc_init) {
-    //monitorar();
+    monitorar();
   }
 }
 
