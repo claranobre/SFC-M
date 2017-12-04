@@ -62,7 +62,7 @@ int measureEnd;
 boolean saveToFile;
 float systolic;
 float diastolic;
-Table t = new Table();
+Table t;
 
 void setup() {
   size(900, 725);  // Stage size
@@ -351,7 +351,7 @@ void setupFile(String name) {
   File f = new File(name + ".csv");
   if (!f.exists()) {
     //creates table
-    Table t = new Table();
+    t = new Table();
     t.addColumn("Date");
     t.addColumn("Time");
     t.addColumn("Systolic");
