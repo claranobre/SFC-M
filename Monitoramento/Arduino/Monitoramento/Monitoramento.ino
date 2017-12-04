@@ -226,7 +226,7 @@ void monitorar() {
     }
 
   Serial.print(systolic[10]);
-  Serial.print(",");
+  Serial.print("/");
   Serial.println(diastolic[10]);
   
   }

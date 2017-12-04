@@ -61,6 +61,7 @@ void keyPressed(){
    case 'S':
      //Create textbox
      //drawTextBox();
+     setupFile("name");
    default:
      break;
  }

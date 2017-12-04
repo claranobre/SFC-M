@@ -55,6 +55,14 @@ boolean refreshPorts = false;
 boolean send = false;
 String msg = "";*/
 
+//SAVING FILES
+Straing fileName;
+int measureStart;
+int measureEnd;
+boolean saveToFile;
+float systolic;
+float diastolic;
+
 void setup() {
   size(900, 725);  // Stage size
   frameRate(100);
@@ -104,6 +112,10 @@ void setup() {
   fill(eggshell);
   text("Select Your Serial Port",245,30);
   listAvailablePorts();
+
+  measureStart = measureEnd = 0;
+  saveToFile = false;
+  systolic = diastolic = 0.0;
 }
 
 /*void setupTextBox() {
@@ -137,6 +149,18 @@ void draw() {
     }
   }  
     //setupTextBox();
+
+  //waits for 5 seconds until sensor data
+  //stabilize, then writes info to file
+  //TODO: change to 15 seconds
+  if (saveToFile) {
+    measureEnd = millis();
+    if (measureEnd - measureStart >= 5000) {
+      writeToFile();
+      saveToFile = false;
+    }
+  }
+
 }  //end of draw loop
 
 /*void drawTextBox() {
@@ -317,4 +341,35 @@ void printDataToScreen(){ // PRINT THE DATA AND VARIABLE VALUES
       text(BPM[i] + " BPM", 800, BPMWindowY[i] +185);// 215          // print the Beats Per Minute
       text("IBI " + IBI[i] + "mS", 800, BPMWindowY[i] + 160);// 245   // print the time between heartbeats in mS
     }
+}
+
+setupFile(String name) {
+  File f = new File(name + ".csv");
+  if (!f.exists()) {
+    //creates table
+    Table t = new Table();
+    t.addColumn("Date");
+    t.addColumn("Time");
+    t.addColumn("Systolic");
+    t.addColumn("Diastolic");
+
+    fileName = f.getAbsolutePath();
+    saveTable(t, fileName);
+  }
+  saveToFile = true;
+  measureStart = measureEnd = millis();
+}
+
+writeToFile() {
+  Table t = loadTable(fileName, "header");
+  TableRow row = t.addRow();
+
+  String str = day() + "/" + month() + "/" + year();
+  row.setString("Date", str);
+
+  str = hour() + ":" + minute();
+  row.setString("Time", str);
+
+  row.setFloat("Systolic", systolic);
+  row.setFloat("Diastolic", diastolic);
 }
