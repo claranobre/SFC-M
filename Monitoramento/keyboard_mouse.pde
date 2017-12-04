@@ -49,7 +49,7 @@ void mouseReleased(){
 void keyPressed(){
 
  switch(key){
-   case 'p':    // pressing 's' or 'S' will take a jpg of the processing window
+   case 'p':    // pressing 'p' or 'P' will take a jpg of the processing window
    case 'P':
      saveFrame("heartLight-####.jpg");    // take a shot of that!
      break;
