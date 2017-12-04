@@ -49,7 +49,11 @@ Radio[] button = new Radio[Serial.list().length*2];
 int numPorts = serialPorts.length;
 boolean refreshPorts = false;
 
-
+// CONTROLE DA TECLA PRESSIONADA E TEXTBOX
+TextBox tbox;
+int key;
+boolean keyPressed;
+ 
 void setup() {
   size(900, 725);  // Stage size
   frameRate(100);
@@ -109,7 +113,7 @@ if(serialPortFound){
   drawBPMwaveform();
   drawHeart();
   printDataToScreen();
-
+ 
 } else { // SCAN TO FIND THE SERIAL PORT
   autoScanPorts();
 
@@ -124,11 +128,34 @@ if(serialPortFound){
     button[i].overRadio(mouseX,mouseY);
     button[i].displayRadio();
   }
+  }
 
-}
-
+  // Ação pra tecla pressionada
+  if(keyPressed == true){
+    updateKeys();
+  } else {
+    //print("Só pra não ficar vazio");
+  }
 }  //end of draw loop
 
+void updateKeys() {
+  if(keyPressed){
+    if(key == ENTER){
+    //text("Digite o seu nome: " + result, 19, 19);
+    tbox = new TextBox(
+    "Please enter your name: ", 
+    width/2-width/3, height/4 + height/16, // x, y
+    width/3, height/2 - height/4 - height/8, // w, h
+    215, // lim
+    0300 << 030, color(-1, 040), // textC, baseC
+    color(-1, 0100), color(#FF00FF, 0200)); // bordC, slctC
+    tbox.display();
+  //Salvar arquivo etc
+    }else{
+  //Continuar programa
+    }
+  }
+}
 
 void drawDataWindows(){
   noStroke();
@@ -192,6 +219,7 @@ for (int i=0; i<numSensors; i++) {
   endShape();
 }
 }
+
 void drawHeart(){
   // DRAW THE HEART AND MAYBE MAKE IT BEAT
     fill(250,0,0);
@@ -211,8 +239,6 @@ void drawHeart(){
     bezierZero += BPMWindowHeight+spacer;
   }
 }
-
-
 
 void listAvailablePorts(){
   println(Serial.list());    // print a list of available serial ports to the console
