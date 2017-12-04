@@ -1,108 +1,110 @@
-class TextBox {
- 
-  // demands rectMode(CORNER)
- 
-  final color textC, baseC, bordC, slctC;
-  final short x, y, w, h, xw, yh, lim;
- 
-  boolean isFocused;
-  String txt = "";
-  String title; 
- 
-  TextBox(
-    String tt, 
-    int xx, int yy, 
-    int ww, int hh, 
-    int li, 
-    color te, color ba, color bo, color se) {
- 
-    title=tt;
- 
-    x = (short) xx;
-    y = (short) yy;
-    w = (short) ww;
-    h = (short) hh;
- 
-    lim = (short) li;
- 
-    xw = (short) (xx + ww);
-    yh = (short) (yy + hh);
- 
-    textC = te;
-    baseC = ba;
-    bordC = bo;
-    slctC = se;
-  }
- 
-  void display() {
-    stroke(isFocused? slctC : bordC);
- 
-    // outer 
-    fill(baseC);
-    rect(x-10, y-90, w+20, h+100);
- 
-    fill(0); 
-    text(title, x, y-90+20);
- 
-    // main / inner
-    fill(baseC);
-    rect(x, y, w, h);
- 
- 
-    fill(textC);
-    text(txt + blinkChar(), x, y, w, h);
-  }
- 
-  /*void tKeyTyped() {
- 
-    char k = key;
- 
-    if (k == ESC) {
-      // println("esc 2");
-      state=stateNormal; 
-      key=0;
-      return;
-    } 
- 
-    if (k == CODED)  return;
- 
-    final int len = txt.length();
- 
-    if (k == BACKSPACE)  txt = txt.substring(0, max(0, len-1));
-    else if (len >= lim)  return;
-    else if (k == ENTER || k == RETURN) {
-      // this ends the entering 
-      println("RET ");
-      state  = stateNormal; // close input box 
-      result = txt;
-    } else if (k == TAB & len < lim-3)  txt += "    ";
-    else if (k == DELETE)  txt = "";
-    else if (k >= ' ')     txt += str(k);
-  }
- 
- 
-  void tKeyPressed() {
-    if (key == ESC) {
-      println("esc 3");
-      state=stateNormal;
-      key=0;
-    }
- 
-    if (key != CODED)  return;
- 
-    final int k = keyCode;
- 
-    final int len = txt.length();
- 
-    if (k == LEFT)  txt = txt.substring(0, max(0, len-1));
-    else if (k == RIGHT & len < lim-3)  txt += "    ";
-  }*/
- 
-  String blinkChar() {
-    return isFocused && (frameCount>>2 & 1) == 0 ? "_" : "";
-  }
- 
-  boolean checkFocus() {
-    return isFocused = mouseX > x & mouseX < xw & mouseY > y & mouseY < yh;
-  }
+public class TEXTBOX {
+   public int X = 0, Y = 0, H = 35, W = 200;
+   public int TEXTSIZE = 24;
+   
+   // COLORS
+   public color Background = color(140, 140, 140);
+   public color Foreground = color(0, 0, 0);
+   public color BackgroundSelected = color(160, 160, 160);
+   public color Border = color(30, 30, 30);
+   
+   public boolean BorderEnable = false;
+   public int BorderWeight = 1;
+   
+   public String Text = "";
+   public int TextLength = 0;
+
+   private boolean selected = false;
+   
+   TEXTBOX() {
+      // CREATE OBJECT DEFAULT TEXTBOX
+   }
+   
+   TEXTBOX(int x, int y, int w, int h) {
+      X = x; Y = y; W = w; H = h;
+   }
+   
+   void DRAW() {
+      // DRAWING THE BACKGROUND
+      if (selected) {
+         fill(BackgroundSelected);
+      } else {
+         fill(Background);
+      }
+      
+      if (BorderEnable) {
+         strokeWeight(BorderWeight);
+         stroke(Border);
+      } else {
+         noStroke();
+      }
+      
+      rect(X, Y, W, H);
+      
+      // DRAWING THE TEXT ITSELF
+      fill(Foreground);
+      textSize(TEXTSIZE);
+      text(Text, X + (textWidth("a") / 2), Y + TEXTSIZE);
+   }
+   
+   // IF THE KEYCODE IS ENTER RETURN 1
+   // ELSE RETURN 0
+   boolean KEYPRESSED(char KEY, int KEYCODE) {
+      if (selected) {
+         if (KEYCODE == (int)BACKSPACE) {
+            BACKSPACE();
+         } else if (KEYCODE == 32) {
+            // SPACE
+            addText(' ');
+         } else if (KEYCODE == (int)ENTER) {
+            return true;
+         } else {
+            // CHECK IF THE KEY IS A LETTER OR A NUMBER
+            boolean isKeyCapitalLetter = (KEY >= 'A' && KEY <= 'Z');
+            boolean isKeySmallLetter = (KEY >= 'a' && KEY <= 'z');
+            boolean isKeyNumber = (KEY >= '0' && KEY <= '9');
+      
+            if (isKeyCapitalLetter || isKeySmallLetter || isKeyNumber) {
+               addText(KEY);
+            }
+         }
+      }
+      
+      return false;
+   }
+   
+   private void addText(char text) {
+      // IF THE TEXT WIDHT IS IN BOUNDARIES OF THE TEXTBOX
+      if (textWidth(Text + text) < W) {
+         Text += text;
+         TextLength++;
+      }
+   }
+   
+   private void BACKSPACE() {
+      if (TextLength - 1 >= 0) {
+         Text = Text.substring(0, TextLength - 1);
+         TextLength--;
+      }
+   }
+   
+   // FUNCTION FOR TESTING IS THE POINT
+   // OVER THE TEXTBOX
+   private boolean overBox(int x, int y) {
+      if (x >= X && x <= X + W) {
+         if (y >= Y && y <= Y + H) {
+            return true;
+         }
+      }
+      
+      return false;
+   }
+   
+   void PRESSED(int x, int y) {
+      if (overBox(x, y)) {
+         selected = true;
+      } else {
+         selected = false;
+      }
+   }
 }

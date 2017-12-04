@@ -49,11 +49,12 @@ Radio[] button = new Radio[Serial.list().length*2];
 int numPorts = serialPorts.length;
 boolean refreshPorts = false;
 
-// CONTROLE DA TECLA PRESSIONADA E TEXTBOX
-TextBox tbox;
-int key;
-boolean keyPressed;
- 
+// TEXTBOX
+ArrayList<TEXTBOX> textboxes = new ArrayList<TEXTBOX>();
+
+boolean send = false;
+String msg = "";
+
 void setup() {
   size(900, 725);  // Stage size
   frameRate(100);
@@ -104,6 +105,12 @@ void setup() {
   listAvailablePorts();
 }
 
+void setupTextBox() {
+   size(400, 300);
+   
+   InitLayout();
+}
+
 void draw() {
 if(serialPortFound){
   // ONLY RUN THE VISUALIZER AFTER THE PORT IS CONNECTED
@@ -124,37 +131,57 @@ if(serialPortFound){
     listAvailablePorts();
   }
 
-  for(int i=0; i<numPorts+1; i++){
-    button[i].overRadio(mouseX,mouseY);
-    button[i].displayRadio();
-  }
+    for(int i=0; i<numPorts+1; i++){
+      button[i].overRadio(mouseX,mouseY);
+      button[i].displayRadio();
+    }
   }
 
   // Ação pra tecla pressionada
-  if(keyPressed == true){
-    updateKeys();
+  if(keyPressed){
+    drawTextBox();
   } else {
     //print("Só pra não ficar vazio");
   }
 }  //end of draw loop
 
-void updateKeys() {
-  if(keyPressed){
-    if(key == ENTER){
-    //text("Digite o seu nome: " + result, 19, 19);
-    tbox = new TextBox(
-    "Please enter your name: ", 
-    width/2-width/3, height/4 + height/16, // x, y
-    width/3, height/2 - height/4 - height/8, // w, h
-    215, // lim
-    0300 << 030, color(-1, 040), // textC, baseC
-    color(-1, 0100), color(#FF00FF, 0200)); // bordC, slctC
-    tbox.display();
-  //Salvar arquivo etc
-    }else{
-  //Continuar programa
-    }
-  }
+void drawTextBox() {
+   background(180);
+   
+   for (TEXTBOX t : textboxes) {
+      t.DRAW();
+   }
+   
+   if (send) {
+      text(msg, (width - textWidth(msg)) / 2, 260);
+   }
+}
+
+/*void mousePressed() {
+   for (TEXTBOX t : textboxes) {
+      t.PRESSED(mouseX, mouseY);
+   }
+}*/
+
+void keyPressed() {
+   for (TEXTBOX t : textboxes) {
+      if (t.KEYPRESSED(key, keyCode)) {
+         send = true;
+         //msg = "Message is: " + textboxes.get(1).Text;
+      }
+   }
+}
+
+void InitLayout() {
+   TEXTBOX receiver = new TEXTBOX();
+   receiver.W = 300;
+   receiver.H = 35;
+   receiver.X = (width - receiver.W) / 2;
+   receiver.Y = 50;
+   textboxes.add(receiver);
+   
+   TEXTBOX message = new TEXTBOX((width - 300) / 2, 100, 300, 100);
+   textboxes.add(message);
 }
 
 void drawDataWindows(){
