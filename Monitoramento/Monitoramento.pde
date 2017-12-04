@@ -163,7 +163,7 @@ void draw() {
     }
   }
   
-
+  //println("ZA WARUDO " + fileName);
 
 }  //end of draw loop
 
@@ -284,7 +284,7 @@ void drawHeart(){
 }
 
 void listAvailablePorts(){
-  println(Serial.list());    // print a list of available serial ports to the console
+  printArray(Serial.list());    // print a list of available serial ports to the console
   serialPorts = Serial.list();
   fill(0);
   textFont(font,16);
