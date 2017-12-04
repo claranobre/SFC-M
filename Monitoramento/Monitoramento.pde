@@ -56,12 +56,13 @@ boolean send = false;
 String msg = "";*/
 
 //SAVING FILES
-Straing fileName;
+String fileName;
 int measureStart;
 int measureEnd;
 boolean saveToFile;
 float systolic;
 float diastolic;
+Table t = new Table();
 
 void setup() {
   size(900, 725);  // Stage size
@@ -158,8 +159,11 @@ void draw() {
     if (measureEnd - measureStart >= 5000) {
       writeToFile();
       saveToFile = false;
+      saveTable(t, fileName);
     }
   }
+  
+
 
 }  //end of draw loop
 
@@ -343,7 +347,7 @@ void printDataToScreen(){ // PRINT THE DATA AND VARIABLE VALUES
     }
 }
 
-setupFile(String name) {
+void setupFile(String name) {
   File f = new File(name + ".csv");
   if (!f.exists()) {
     //creates table
@@ -360,8 +364,8 @@ setupFile(String name) {
   measureStart = measureEnd = millis();
 }
 
-writeToFile() {
-  Table t = loadTable(fileName, "header");
+void writeToFile() {
+  t = loadTable(fileName, "header");
   TableRow row = t.addRow();
 
   String str = day() + "/" + month() + "/" + year();
