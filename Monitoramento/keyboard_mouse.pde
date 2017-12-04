@@ -49,15 +49,18 @@ void mouseReleased(){
 void keyPressed(){
 
  switch(key){
-   case 's':    // pressing 's' or 'S' will take a jpg of the processing window
-   case 'S':
+   case 'p':    // pressing 's' or 'S' will take a jpg of the processing window
+   case 'P':
      saveFrame("heartLight-####.jpg");    // take a shot of that!
      break;
    case 'r':
    case 'R':
      resetDataTraces();
      break;
-
+   case 's':
+   case 'S':
+     //Create textbox
+     //drawTextBox();
    default:
      break;
  }

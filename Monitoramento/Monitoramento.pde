@@ -50,10 +50,10 @@ int numPorts = serialPorts.length;
 boolean refreshPorts = false;
 
 // TEXTBOX
-ArrayList<TEXTBOX> textboxes = new ArrayList<TEXTBOX>();
+/*ArrayList<TEXTBOX> textboxes = new ArrayList<TEXTBOX>();
 
 boolean send = false;
-String msg = "";
+String msg = "";*/
 
 void setup() {
   size(900, 725);  // Stage size
@@ -63,6 +63,7 @@ void setup() {
   textAlign(CENTER);
   rectMode(CORNER);
   ellipseMode(CENTER);
+   
   // Display Window Setup
   PulseWindowWidth = 490;
   PulseWindowHeight = 640/numSensors;
@@ -105,24 +106,23 @@ void setup() {
   listAvailablePorts();
 }
 
-void setupTextBox() {
-   size(400, 300);
-   
-   InitLayout();
-}
+/*void setupTextBox() {
+  size(200, 100);
+  initLayout();
+}*/
 
 void draw() {
-if(serialPortFound){
-  // ONLY RUN THE VISUALIZER AFTER THE PORT IS CONNECTED
-  background(0);
-  drawDataWindows();
-  drawPulseWaveform();
-  drawBPMwaveform();
-  drawHeart();
-  printDataToScreen();
+  if(serialPortFound){
+    // ONLY RUN THE VISUALIZER AFTER THE PORT IS CONNECTED
+    background(0);
+    drawDataWindows();
+    drawPulseWaveform();
+    drawBPMwaveform();
+    drawHeart();
+    printDataToScreen();
  
-} else { // SCAN TO FIND THE SERIAL PORT
-  autoScanPorts();
+  } else { // SCAN TO FIND THE SERIAL PORT
+    autoScanPorts();
 
   if(refreshPorts){
     refreshPorts = false;
@@ -130,23 +130,17 @@ if(serialPortFound){
     drawHeart();
     listAvailablePorts();
   }
-
+  
     for(int i=0; i<numPorts+1; i++){
       button[i].overRadio(mouseX,mouseY);
       button[i].displayRadio();
     }
-  }
-
-  // Ação pra tecla pressionada
-  if(keyPressed){
-    drawTextBox();
-  } else {
-    //print("Só pra não ficar vazio");
-  }
+  }  
+    //setupTextBox();
 }  //end of draw loop
 
-void drawTextBox() {
-   background(180);
+/*void drawTextBox() {
+   background(0);
    
    for (TEXTBOX t : textboxes) {
       t.DRAW();
@@ -157,13 +151,7 @@ void drawTextBox() {
    }
 }
 
-/*void mousePressed() {
-   for (TEXTBOX t : textboxes) {
-      t.PRESSED(mouseX, mouseY);
-   }
-}*/
-
-void keyPressed() {
+void keyBoardPressed(){
    for (TEXTBOX t : textboxes) {
       if (t.KEYPRESSED(key, keyCode)) {
          send = true;
@@ -172,7 +160,7 @@ void keyPressed() {
    }
 }
 
-void InitLayout() {
+void initLayout() {
    TEXTBOX receiver = new TEXTBOX();
    receiver.W = 300;
    receiver.H = 35;
@@ -183,7 +171,7 @@ void InitLayout() {
    TEXTBOX message = new TEXTBOX((width - 300) / 2, 100, 300, 100);
    textboxes.add(message);
 }
-
+*/
 void drawDataWindows(){
   noStroke();
   // DRAW OUT THE PULSE WINDOW AND BPM WINDOW RECTANGLES
@@ -328,6 +316,5 @@ void printDataToScreen(){ // PRINT THE DATA AND VARIABLE VALUES
       text("Sensor # " + (i+1), 800, BPMWindowY[i] + 220);
       text(BPM[i] + " BPM", 800, BPMWindowY[i] +185);// 215          // print the Beats Per Minute
       text("IBI " + IBI[i] + "mS", 800, BPMWindowY[i] + 160);// 245   // print the time between heartbeats in mS
-
     }
 }
