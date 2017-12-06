@@ -163,7 +163,7 @@ void draw() {
     }
   }
   
-  //println("ZA WARUDO " + fileName);
+  println("ZA WARUDO " + fileName);
 
 }  //end of draw loop
 

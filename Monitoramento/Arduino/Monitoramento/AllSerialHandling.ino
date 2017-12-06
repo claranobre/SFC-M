@@ -51,3 +51,4 @@ void sendDataToSerial(char symbol, int data ){
     Serial.print(symbol);
     Serial.println(data);
   }
+

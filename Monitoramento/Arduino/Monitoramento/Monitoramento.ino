@@ -45,6 +45,9 @@ int blinkPin[numPulseSensors];                // pin to blink led at each beat
 int fadePin[numPulseSensors];                  // pin to do fancy classy fading blink at each beat
 int fadeRate[numPulseSensors];                 // used to fade LED on with PWM on fadePin
 
+const float b1 = -95.064;
+const float b0 = 0.32071;
+
 // LED's
 // red = blinkPin
 int yellow[numPulseSensors];
@@ -98,8 +101,8 @@ void setup() {
 
   setStuph();                       // initialize variables and pins
 
-  Serial.begin(250000);          // we agree to talk fast!
-  //Serial.begin(115200);           // we agree to talk fast!
+  //Serial.begin(250000);          // we agree to talk fast!
+  Serial.begin(115200);           // we agree to talk fast!
    
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS
 }
@@ -225,9 +228,10 @@ void monitorar() {
       turnLedOn(yellow[i]);
     }
 
-  Serial.print(systolic[10]);
+
+  Serial.print(b1 + b0 * systolic[10]);
   Serial.print("/");
-  Serial.println(diastolic[10]);
+  Serial.println(b1 + b0 * diastolic[10]);
   
   }
 }
@@ -404,3 +408,4 @@ void turnLedOn(int new_led) {
       digitalWrite(led_on, HIGH);
     }
 }
+
